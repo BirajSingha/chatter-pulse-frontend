@@ -1,8 +1,7 @@
-import { useMutation } from "@tanstack/react-query";
-import axios from "axios";
 import Cookies from "js-cookie";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
+import useSignupMutation from "./api/query/useSignupMutation";
 
 const Signup = () => {
   const router = useRouter();
@@ -28,6 +27,15 @@ const Signup = () => {
       }, 3000);
     }
   }, [errorMessage]);
+
+  useEffect(() => {
+    const accessToken = Cookies.get("accessToken");
+
+    if (!accessToken) return;
+    router.replace("/");
+  }, []);
+
+  const signupMutation = useSignupMutation(setErrorMessage);
 
   const handleSignup = async (event) => {
     event.preventDefault();
@@ -64,32 +72,8 @@ const Signup = () => {
       return;
     }
 
-    signinMutation.mutate({ name, email, phone, address, password });
+    signupMutation.mutate({ name, email, phone, address, password });
   };
-
-  const signupFnc = async () => {
-    const response = await axios.post("http://localhost:3000/auth/signUp", {
-      username: name,
-      email,
-      password,
-      phone,
-      address,
-    });
-    return response.data;
-  };
-
-  const signinMutation = useMutation({
-    mutationFn: signupFnc,
-    onSuccess: (data) => {
-      console.log("Signup successful:", data);
-      Cookies.set("accessToken", data.accessToken);
-      router.push("/otp-verify");
-    },
-    onError: (error) => {
-      console.error("Signup failed:", error);
-      setErrorMessage("Signup failed. Please try again.");
-    },
-  });
 
   return (
     <div
@@ -145,10 +129,11 @@ const Signup = () => {
             className="w-full p-3 border border-gray-300 rounded-lg mb-4 focus:outline-none focus:border-blue-500 dark:bg-gray-700 dark:text-white"
           />
           <button
+            disabled={signupMutation.isPending}
             type="submit"
-            className="w-full p-3 bg-blue-500 text-white rounded-lg mb-4"
+            className="w-full p-3 bg-blue-500 text-white rounded-lg mb-4 disabled:cursor-not-allowed"
           >
-            Sign Up
+            {signupMutation.isPending ? "Signing up..." : "Sign Up"}
           </button>
         </form>
 

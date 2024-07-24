@@ -1,6 +1,6 @@
 import React from "react";
 
-const FollowSection = ({ friendList, setFriendList }) => {
+const FriendsSuggestions = ({ friendList, setFriendList }) => {
   const handleFollowToggle = (id) => {
     const updatedFriends = friendList.map((friend) =>
       friend.id === id
@@ -12,9 +12,9 @@ const FollowSection = ({ friendList, setFriendList }) => {
   };
   return (
     <div className="hidden sm:flex flex-col w-full p-5 rounded-md bg-slate-200 dark:bg-slate-900">
-      <h2 className="font-bold mb-4">Friends</h2>
+      <h2 className="font-bold mb-4">Suggestions</h2>
       {friendList
-        .filter((frnd) => frnd.isFollowing)
+        .filter((frnd) => !frnd.isFollowing)
         .map((friend) => (
           <div key={friend.id} className="flex items-center mb-4">
             <img
@@ -44,4 +44,4 @@ const FollowSection = ({ friendList, setFriendList }) => {
   );
 };
 
-export default FollowSection;
+export default FriendsSuggestions;

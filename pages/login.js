@@ -1,8 +1,7 @@
-import axios from "axios";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
-import { useMutation } from "@tanstack/react-query";
 import Cookies from "js-cookie";
+import useSigninMutation from "./api/query/useSigninMutation";
 
 const Login = () => {
   const router = useRouter();
@@ -30,8 +29,10 @@ const Login = () => {
     const accessToken = Cookies.get("accessToken");
 
     if (!accessToken) return;
-    router.push("/");
+    router.replace("/");
   }, []);
+
+  const signinMutation = useSigninMutation(setErrorMessage);
 
   const handleLogin = async (event) => {
     event.preventDefault();
@@ -58,28 +59,6 @@ const Login = () => {
 
     signinMutation.mutate({ email, password });
   };
-
-  const loginFnc = async () => {
-    const response = await axios.post("http://localhost:3000/auth/signIn", {
-      email,
-      password,
-    });
-    return response.data;
-  };
-
-  const signinMutation = useMutation({
-    mutationFn: loginFnc,
-    onSuccess: (data) => {
-      console.log("Logged successful:", data);
-      Cookies.set("accessToken", data.accessToken);
-      setErrorMessage("Logged in successfully!");
-      router.push("/");
-    },
-    onError: (error) => {
-      console.log("Login failed:", error);
-      setErrorMessage("Login failed. Please try again.");
-    },
-  });
 
   return (
     <div
@@ -114,10 +93,11 @@ const Login = () => {
             className="w-full p-3 border border-gray-300 rounded-lg mb-4 focus:outline-none focus:border-blue-500 dark:bg-gray-700 dark:text-white"
           />
           <button
+            disabled={signinMutation.isPending}
             type="submit"
-            className="w-full p-3 bg-blue-500 text-white rounded-lg mb-4"
+            className="w-full p-3 bg-blue-500 text-white rounded-lg mb-4 disabled:cursor-not-allowed"
           >
-            Log in
+            {signinMutation.isPending ? "Loging in..." : "Log in"}
           </button>
         </form>
 

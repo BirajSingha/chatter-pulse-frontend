@@ -1,12 +1,47 @@
 import { useRouter } from "next/router";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { TailSpin } from "react-loader-spinner";
+import useAccVerifyMutation from "./api/query/useAccVerifyMutation";
+import useReqAccVerifyMutation from "./api/query/useReqAccVerifyMutation";
 
 const OTPVerify = () => {
   const router = useRouter();
-  const [errorMessage, setErrorMessage] = useState("");
-  const [verificationCode, setVerificationCode] = useState("");
+  const { accessToken } = router.query;
 
-  const handleVerification = () => {};
+  const [verificationCode, setVerificationCode] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
+
+  useEffect(() => {
+    if (errorMessage) {
+      setTimeout(() => {
+        setErrorMessage("");
+      }, 3000);
+    }
+  }, [errorMessage]);
+
+  const accVerifyMutation = useAccVerifyMutation(setErrorMessage, accessToken);
+  const resendCodeMutation = useReqAccVerifyMutation(setErrorMessage);
+
+  const handleVerification = async (event) => {
+    event.preventDefault();
+    setErrorMessage("");
+
+    if (!verificationCode) {
+      setErrorMessage("Verification code is required!");
+      return;
+    }
+    if (verificationCode && verificationCode.length !== 4) {
+      setErrorMessage("Verification code should be 4 digits!");
+      return;
+    }
+
+    accVerifyMutation.mutate({ accessToken, verificationCode });
+  };
+
+  const handleResendCode = () => {
+    setVerificationCode("");
+    resendCodeMutation.mutate({ accessToken });
+  };
 
   return (
     <div
@@ -35,12 +70,35 @@ const OTPVerify = () => {
           />
 
           <button
+            disabled={accVerifyMutation.isPending}
             type="submit"
-            className="w-full p-3 bg-blue-500 text-white rounded-lg mb-4"
+            className="w-full p-3 bg-blue-500 text-white rounded-lg mb-4 disabled:cursor-not-allowed"
           >
-            Verify
+            {accVerifyMutation.isPending ? "Verifying..." : "Verify"}
           </button>
         </form>
+        <div className="text-center flex gap-2">
+          <p className="text-gray-700 dark:text-gray-300 mb-4">
+            Forgot your code?{" "}
+            <a
+              href="#"
+              onClick={handleResendCode}
+              className="text-blue-500 dark:text-blue-400"
+            >
+              {resendCodeMutation.isPending ? "Resending..." : "Resend code"}
+            </a>
+          </p>
+          {resendCodeMutation.isPending ? (
+            <TailSpin
+              visible={true}
+              height="20"
+              width="20"
+              color="#4fa94d"
+              ariaLabel="tail-spin-loading"
+              radius="1"
+            />
+          ) : null}
+        </div>
       </div>
     </div>
   );

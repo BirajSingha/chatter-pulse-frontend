@@ -7,7 +7,7 @@ const MenuSection = ({ onMenuChange }) => {
   };
 
   return (
-    <div className="flex flex-col items-start gap-4 w-3/12 p-5 rounded-md bg-slate-200 dark:bg-slate-900">
+    <div className="hidden sm:flex flex-col items-start gap-4 w-3/12 p-5 rounded-md bg-slate-200 dark:bg-slate-900">
       <div
         onClick={() => handleMenuItemClick("home")}
         className="flex items-center gap-3 cursor-pointer"
@@ -60,6 +60,22 @@ const MenuSection = ({ onMenuChange }) => {
           />
         </div>
         <h4>Notifications</h4>
+      </div>
+
+      <div
+        onClick={() => handleMenuItemClick("profile")}
+        className="flex items-center gap-3 cursor-pointer"
+      >
+        <div className="relative">
+          <Image
+            src="/user.png"
+            width={18}
+            height={18}
+            alt="Picture of the user"
+            className="dark:invert"
+          />
+        </div>
+        <h4>Profile</h4>
       </div>
     </div>
   );

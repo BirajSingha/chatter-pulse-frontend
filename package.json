@@ -17,7 +17,8 @@
     "next": "14.2.5",
     "next-themes": "^0.3.0",
     "react": "^18",
-    "react-dom": "^18"
+    "react-dom": "^18",
+    "react-loader-spinner": "^6.1.6"
   },
   "devDependencies": {
     "@tanstack/eslint-plugin-query": "^5.51.12",
